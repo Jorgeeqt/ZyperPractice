@@ -9,29 +9,33 @@ use pocketmine\utils\Config;
 
 class ZyperCore extends PluginBase {
   
-  private static ?ZyperCore $instance;
-  private SessionManager $sessionManager;
+  private static ZyperCore $instance;
+  
+  public ?DataBase $db = null;
+  public ?SessionManager $sessionManager = null;
+  
+  public static function getInstance(): ZyperCore
+  {
+    return self::$instance;
+  }
+  
+  public function onLoad(): void 
+  {
+    $this->getServer()->getNetwork()->setName($this->getConfig()->get("server_motd"));
+  }
   
   public function onEnable(): void {
-    self::$instance = $this;
-    self::$sessionManager = new SessionManager();
+    $this->sessionManager = new SessionManager($this);
     
-    $this->getServer()->getPluginManager()->registerEvents(new EventManager($this), $this));
-    
-    $this->getServer()->getWorldManager()->loadWorld($this->getConfig()->get("spawn_world"));
     $this->getServer()->getWorldManager()->loadWorld($this->getConfig()->get("nodebuff_world"));
-    $this->getServer()->getWorldManager()->loadWorld($this->getConfig()->get("gapple_world"));
-    $this->getServer()->getWorldManager()->loadWorld($this->getConfig()->get("combo_world"));
+    $this->getServer()->getWorldManager()->loadWorld($this->getConfig()->get("sumo_world"));
     
-    $this->getServer()->getNetwork()->setName(TextFormat::colorize($this->getConfig()->get("server_motd"));
+    $this->getServer()->getCommandMap()->registerAll(Objects::NAME_SERVER, [
+      new  Ping(),
+      new ReKit(),
+      new Spawn(),
+    ]);
     
-    $this->getScheduler()->scheduleRepeatingTask(new ScoreboardTask($this), 10);
-                                              
-    $this->scoreboard = new Scoreboard();
-                                
-   
-    $this->getServer()->getCommandMap()->register("hub" new Hub($this));
-    $this->getServer()->getCommandMap()->register("ping" new Ping($this));
-    $this->getServer()->getCommandMap()->register("rekit" new ReKit($this));
-  }                    
-                                              
+    //$this->db = libasynql::create($this, ["type" => "sqlite", "sqlite" => ["file" => $this->getDataFolder() . "sqlite.db"]], ["sqlite" => "sqlite.sql"]);
+  }
+}
