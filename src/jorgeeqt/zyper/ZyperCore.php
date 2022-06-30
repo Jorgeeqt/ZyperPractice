@@ -11,9 +11,6 @@ class ZyperCore extends PluginBase {
   
   private static ZyperCore $instance;
   
-  public ?DataBase $db = null;
-  public ?SessionManager $sessionManager = null;
-  
   public static function getInstance(): ZyperCore
   {
     return self::$instance;
@@ -25,13 +22,13 @@ class ZyperCore extends PluginBase {
   }
   
   public function onEnable(): void {
-    $this->sessionManager = new SessionManager($this);
+    $this->getLogger()->info(Objects::NAME_SERVER." Loaded");
     
     $this->getServer()->getWorldManager()->loadWorld($this->getConfig()->get("nodebuff_world"));
     $this->getServer()->getWorldManager()->loadWorld($this->getConfig()->get("sumo_world"));
     
     $this->getServer()->getCommandMap()->registerAll(Objects::NAME_SERVER, [
-      new  Ping(),
+      new Ping(),
       new ReKit(),
       new Spawn(),
     ]);
